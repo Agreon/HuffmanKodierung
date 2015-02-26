@@ -28,7 +28,7 @@ codeTable Huffman::GenerateCodeTable(const std::string& text)
 }
 
 
-std::string Huffman::EncodeString(const std::string& text, codeTable& table)
+std::string Huffman::EncodeString(const std::string& text, codeTable table)
 {
     std::string encoded = "";
     
@@ -40,29 +40,68 @@ std::string Huffman::EncodeString(const std::string& text, codeTable& table)
     return encoded;
 }
 
-std::string Huffman::DecodeString(const std::string& text, codeTable& table)
-{
+std::string Huffman::DecodeString(const std::string& _text, codeTable table)
+{   
     std::string decoded = "";
-    int cIndex = 0;
-    std::string tmp = ""+text[0];
-    /*
-    while(cIndex < text.size() -1)
+    
+    std::string text = _text;
+    std::vector<std::string> codes;
+    
+    for(auto const &it : table) 
     {
-        for(auto const &it : table) 
-        {
-            if(tmp == it.second)
-            {
-                decoded += it.first;
-                tmp = "";
-            }
-            else
-            {
-                cIndex++;
-                tmp += text[cIndex];
-            }
-        }      
-    }*/
-            
+        codes.push_back(it.second);
+    }
+    
+    int cIndex = 0;
+    
+    std::string check = "";
+    check += _text[0];
+    
+    bool found = false;
+    
+     while(cIndex < text.size())
+     {
+         for(int i = 0; i < codes.size(); i++)
+         {
+             if(check == codes[i])
+             {
+                bool notOnly = false;
+                for(int j = 0; j < codes.size(); j++)
+                {
+                    if(cIndex+1 >= text.size()) break;
+                    
+                    if(codes[j] == check+text[cIndex+1]) 
+                    {
+                        notOnly = true;
+                        break;
+                    }
+                }
+                if(notOnly) break;
+                 
+                text = text.substr(check.size());
+                for(auto const &it : table) 
+                {
+                    if(check == it.second)
+                    {
+                        decoded += it.first;
+                    }
+                }   
+                cIndex = 0;
+                check = "";
+                check += text[0];
+                found = true;
+                break;
+             }
+         }
+         if(found)
+         {
+             found = false;
+             continue;
+         }
+        
+        cIndex++;
+        check += text[cIndex];  
+     }
     
     return decoded;
 }
@@ -232,106 +271,3 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
     }
     return table;
 }
-
-
-/*
- * void Huffman::ConnectNodes(std::vector<Node*> &nodes)
-{
-    int notConnected = 0;
-    int newValue = 0;
-    /*
-     As long as there are unconnected nodes, connect them.
-     
-    while(true)
-    {
-        /*
-         Search for 2 not connected nodes
-         
-        Node *first;
-        Node *second;
-        
-        notConnected = 0;
-        // Check if only one is left
-        for(int i = 0; i < nodes.size(); i++)
-        {
-            if(nodes[i]->IsConnected() == false)
-            {
-                notConnected++;
-            }
-        }
-        if(notConnected < 2) break;
-        
-        // Search for first
-        for(int i = 0; i < nodes.size(); i++)
-        {
-            if(nodes[i]->IsConnected() == false) 
-            {
-                first = nodes[i];
-                break;
-            }
-        }
-        
-        // Search for second
-        for(int i = 0; i < nodes.size(); i++)
-        {
-            if(nodes[i]->IsConnected() == false && nodes[i] != first) 
-            {
-                second = nodes[i];
-                break;
-            }
-        }
-        
-        // Set the new node to the correct position
-        newValue = first->GetValue() + second->GetValue();
-        for(int i = 0; i < nodes.size(); i++)
-        {
-            if(newValue <= nodes[i]->GetValue())
-            {
-                first->SetConnected(true);
-                second->SetConnected(true);
-                first->SetBinValue(0);
-                second->SetBinValue(1);
-                nodes.insert(nodes.begin()+i, new Node(0, newValue, first, second));
-                break;
-            }
-            if(i == nodes.size()-1)
-            {
-                first->SetConnected(true);
-                second->SetConnected(true);
-                first->SetBinValue(0);
-                second->SetBinValue(1);
-                nodes.push_back(new Node(0, newValue, first, second));
-                break;
-            }
-        }
-    }
-}
-
-
-void Huffman::CreateCodeTable(std::vector<Node*>& nodes)
-{
-    std::string text = GetNextBinKey(nodes, nodes.back(), "");
-    std::cout << text << std::endl;
-}
-
-std::string Huffman::GetNextBinKey(Node *nextNode, std::string txt)
-{
-    if(nextNode->GetBinValue() == 0) txt += "0";
-    if(nextNode->GetBinValue() == 1) txt += "1";
-    
-    if(nextNode->GetNode1() == 0)
-    {
-        if(nextNode->GetNode2() == 0)
-        {
-            return txt;
-        }
-        else
-        {
-            return GetNextBinKey(nextNode->GetNode2(), txt);
-        }
-    }
-    else
-    {
-        return GetNextBinKey(nextNode->GetNode1(), txt);
-    }
-}*/

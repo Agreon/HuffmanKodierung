@@ -24,8 +24,8 @@ public:
     ~Huffman();
     
     codeTable GenerateCodeTable(const std::string& text);
-    std::string EncodeString(const std::string& text, codeTable& table);
-    std::string DecodeString(const std::string& text, codeTable& table);
+    std::string EncodeString(const std::string& text, codeTable table);
+    std::string DecodeString(const std::string& _text, codeTable table);
 private:
     std::vector<Node*> CreateNodes(const std::string& text);
     int GetAppearance(char character, const std::string& text);
