@@ -15,7 +15,11 @@ Huffman::~Huffman()
 {
 }
 
-
+/**
+ * Generates a code table that you can use to en- and decode a string.
+ * @param text Your text
+ * @return a code table
+ */
 codeTable Huffman::GenerateCodeTable(const std::string& text)
 {
     std::vector<Node*> nodes = CreateNodes(text);
@@ -27,8 +31,13 @@ codeTable Huffman::GenerateCodeTable(const std::string& text)
     return CreateCodeTable(nodes);
 }
 
-
-std::string Huffman::EncodeString(const std::string& text, codeTable table)
+/**
+ * Encodes a string with a previously generated code table.
+ * @param text
+ * @param table
+ * @return the encoded string.
+ */
+std::string Huffman::EncodeString(const std::string& text, codeTable &table)
 {
     std::string encoded = "";
     
@@ -40,7 +49,18 @@ std::string Huffman::EncodeString(const std::string& text, codeTable table)
     return encoded;
 }
 
-std::string Huffman::DecodeString(const std::string& _text, codeTable table)
+/**
+ * Decodes a string with a previously generated code table.
+ * @param _text
+ * @param table
+ * @return the decoded string.
+ * 
+ * Problem:
+ * When checking the second time, strings that were not possible before are interfering.
+ * FUCK
+ * 
+ */
+std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
 {   
     std::string decoded = "";
     
@@ -59,6 +79,8 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable table)
     
     bool found = false;
     
+    std::cout << _text << std::endl;
+    
      while(cIndex < text.size())
      {
          for(int i = 0; i < codes.size(); i++)
@@ -70,7 +92,22 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable table)
                 {
                     if(cIndex+1 >= text.size()) break;
                     
-                    if(codes[j] == check+text[cIndex+1]) 
+                    if(check.size() > codes[j].size()) continue;
+                    
+                    bool includes = true;
+                    for(int k = 0; k < check.size(); k++)
+                    {
+                        if(codes[j][k] != check[k]) includes = false;
+                    }
+                    if(includes)
+                    {
+                        notOnly = true;
+                        break;
+                    }
+                    
+                    //if(codes[j].substr(0,check.size()+1) == check+text[cIndex+1])
+                   // if(check+text[cIndex+1] == "110")  std::cout << codes[j].substr(0,check.size()) << std::endl;
+                    if(codes[j] == check+text[cIndex+1] && codes[j].size() >= codes[i].size()) 
                     {
                         notOnly = true;
                         break;
@@ -106,27 +143,35 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable table)
     return decoded;
 }
 
-/*
- TODO: All characters
+/**
+ * Creates nodes for every char depending on its frequency.
+ * @param text
+ * @return 
  */
 std::vector<Node*> Huffman::CreateNodes(const std::string& text)
 {
     std::vector<Node*> nodes;
-    for(int i = 97; i < 97+26; i++)
+    
+    for(int i = 0; i < 255; i++)
     {
-        int appearance = GetAppearance((char)i,text);
+        int appearance = GetFrequency((char)i,text);
         if(appearance > 0)
         {
             nodes.push_back(new Node((char)i,appearance));
             
             std::cout << "Added new Node(" << nodes.back()->GetCharacter() << "," << nodes.back()->GetValue() << ")" << std::endl;
         }
-    }
-    
+    }    
     return nodes;
 }
 
-int Huffman::GetAppearance(char character, const std::string& text)
+/**
+ * A simple frequency Analysis.
+ * @param character
+ * @param text
+ * @return the frequency of a character in the string.
+ */
+int Huffman::GetFrequency(char character, const std::string& text)
 {
     int appearance = 0;
     
@@ -138,6 +183,10 @@ int Huffman::GetAppearance(char character, const std::string& text)
     return appearance;
 }
 
+/**
+ * Basically a SelectionSort. Sorts nodes by their values.
+ * @param nodes
+ */
 void Huffman::SortNodes(std::vector<Node*> &nodes)
 {
     int min;
@@ -165,6 +214,7 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
 {
     int notConnected = 0;
     int newValue = 0;
+    
     /*
      As long as there are unconnected nodes, connect them.
      */
@@ -242,12 +292,19 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
     }
 }
 
+/**
+ * Creates a code table based on a binary tree.
+ * @param nodes
+ * @return 
+ */
 codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
 {
     Node *currentNode = 0;
     std::string text;
     codeTable table;
-    std::cout << "Bin-Keys" << std::endl;
+    
+    std::cout << "Binary-Keys" << std::endl;
+    
     for(int i = 0; i < nodes.size(); i++)
     {
         if(nodes[i]->GetCharacter() != 0)
@@ -264,7 +321,6 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
                 else text += "1";
                 currentNode = currentNode->GetNextNode();
             }
-            //nodes[i]->SetBinKey(text);
             table[nodes[i]->GetCharacter()] = text;
             std::cout << nodes[i]->GetCharacter() << ": " << text << std::endl;
         }

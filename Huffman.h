@@ -19,19 +19,19 @@ typedef std::map<char, std::string> codeTable;
 
 class Huffman 
 {
-public:
+public:  
+    static codeTable GenerateCodeTable(const std::string& text);
+    static void ExtractCodeTable(const std::string& filePath);
+    static std::string EncodeString(const std::string& text, codeTable &table);
+    static std::string DecodeString(const std::string& _text, codeTable &table);
+private:
     Huffman();
     ~Huffman();
-    
-    codeTable GenerateCodeTable(const std::string& text);
-    std::string EncodeString(const std::string& text, codeTable table);
-    std::string DecodeString(const std::string& _text, codeTable table);
-private:
-    std::vector<Node*> CreateNodes(const std::string& text);
-    int GetAppearance(char character, const std::string& text);
-    void SortNodes(std::vector<Node*> &nodes);
-    void ConnectNodes(std::vector<Node*> &nodes);
-    codeTable CreateCodeTable(std::vector<Node*> &nodes);
+    static int GetFrequency(char character, const std::string& text);
+    static void SortNodes(std::vector<Node*> &nodes);
+    static void ConnectNodes(std::vector<Node*> &nodes);
+    static codeTable CreateCodeTable(std::vector<Node*> &nodes);
+    static std::vector<Node*> CreateNodes(const std::string& text);
 private:
     
 };
