@@ -12,6 +12,8 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <fstream>
+#include <sstream>
 
 #include "Node.h"
 
@@ -21,12 +23,11 @@ class Huffman
 {
 public:  
     static codeTable GenerateCodeTable(const std::string& text);
-    static void ExtractCodeTable(const std::string& filePath);
     static std::string EncodeString(const std::string& text, codeTable &table);
     static std::string DecodeString(const std::string& _text, codeTable &table);
 private:
-    Huffman();
-    ~Huffman();
+    Huffman(){}
+    ~Huffman(){}
     static int GetFrequency(char character, const std::string& text);
     static void SortNodes(std::vector<Node*> &nodes);
     static void ConnectNodes(std::vector<Node*> &nodes);

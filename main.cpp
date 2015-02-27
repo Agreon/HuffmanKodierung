@@ -14,12 +14,16 @@ using namespace std;
 
 int main(int argc, char** argv)
 {   
-    std::string toEncode = "hallo lukas!";
+    string toEncode = "ACHT ALTE AMEISEN ASSEN AM ABEND ANANAS";
     codeTable table = Huffman::GenerateCodeTable(toEncode);
-    std::string encoded = Huffman::EncodeString(toEncode,table);
-    std::string decoded = Huffman::DecodeString(encoded, table);
+       
+    string encoded = Huffman::EncodeString(toEncode,table);
+    string decoded = Huffman::DecodeString(encoded, table);
     
-    std::cout << decoded;
+    cout << "Encoded string: " << encoded << endl;
+    cout << "Size: " << encoded.size() << " Bit" << endl;
+    
+    cout << "The normal text would have a size of " << toEncode.size()*8 << " Bit" << endl;
     
     return 0;
 }

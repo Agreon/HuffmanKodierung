@@ -5,15 +5,9 @@
  * Created on February 26, 2015, 3:56 PM
  */
 
+#include <fstream>
+
 #include "Huffman.h"
-
-Huffman::Huffman()
-{
-}
-
-Huffman::~Huffman()
-{
-}
 
 /**
  * Generates a code table that you can use to en- and decode a string.
@@ -30,6 +24,71 @@ codeTable Huffman::GenerateCodeTable(const std::string& text)
    
     return CreateCodeTable(nodes);
 }
+
+ /*void Huffman::ExportCodeTable(const std::string& filePath, codeTable& table)
+ {
+     std::ofstream out(filePath);
+     
+     if(out.is_open() == false)
+     {
+         std::cout << "Could not open file to write to!" << std::endl;
+         return;
+     }
+    
+    // Iterare about map
+    for(auto const &it : table) 
+    {
+       // out << it.second << L";";
+       //out << it.first;
+       //out << it.first << "," << it.second << ";";
+    }
+
+    out << "hello"; 
+    out << std::endl;          
+    
+    out.flush();
+ }
+*/
+ 
+/*codeTable Huffman::ImportCodeTable(const std::string& filePath)
+{
+    codeTable table;
+    
+    std::ifstream in(filePath);
+    if(in.is_open() == false)
+    {
+        std::cout << "Could not open file to read from!" << std::endl;
+        return table;
+    }
+    
+    std::string line;
+    std::string item;
+    std::vector<std::string> elements;
+    std::vector<std::string> elements2;
+    
+    while( getline(in,line) )
+    {
+        std::stringstream ss(line);
+        while( getline(ss,item,';') )
+        {
+            elements.push_back(item);
+        }
+    }   
+    
+    for(auto& element : elements)
+    {
+        std::stringstream ss(element);
+        while( getline(ss,item,','))
+        {
+            elements2.push_back(item);
+        }
+        table[elements2[0][0]] = elements[1];
+        elements2.clear();
+    }
+    
+    return table;
+}*/
+
 
 /**
  * Encodes a string with a previously generated code table.
@@ -62,6 +121,7 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
     std::string text = _text;
     std::vector<std::string> codes;
     
+    // Save all codes in a iteratable vector.
     for(auto const &it : table) 
     {
         codes.push_back(it.second);
@@ -73,16 +133,17 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
     check += _text[0];
     
     bool alreadyFound = false;
-    
-    std::cout << _text << std::endl;
-    
-     while(cIndex < text.size())
-     {
-         for(int i = 0; i < codes.size(); i++)
-         {
-             if(check == codes[i])
-             {                
+       
+    while(cIndex < text.size())
+    {
+        // Got through all codes an check if the current piece of the encoded string matches a code.
+        for(int i = 0; i < codes.size(); i++)
+        {
+            if(check == codes[i])
+            {                
+                // If so, delete the code from the encoded string.
                 text = text.substr(check.size());
+                // Add a character from the code table to the decoded string.
                 for(auto const &it : table) 
                 {
                     if(check == it.second)
@@ -95,17 +156,19 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
                 check += text[0];
                 alreadyFound = true;
                 break;
-             }
-         }
-         if(alreadyFound)
-         {
-             alreadyFound = false;
-             continue;
-         }
+            }
+        }
+        // If theres a character found, begin from new with a single char.
+        if(alreadyFound)
+        {
+            alreadyFound = false;
+            continue;
+        }
         
+        // Add a character from the encoded string to the check variable.
         cIndex++;
         check += text[cIndex];  
-     }
+    }
     
     return decoded;
 }
@@ -118,13 +181,14 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
 std::vector<Node*> Huffman::CreateNodes(const std::string& text)
 {
     std::vector<Node*> nodes;
+    int frequency;
     
     for(int i = 0; i < 255; i++)
     {
-        int appearance = GetFrequency((char)i,text);
-        if(appearance > 0)
+        frequency = GetFrequency((char)i,text);
+        if(frequency > 0)
         {
-            nodes.push_back(new Node((char)i,appearance));
+            nodes.push_back(new Node((char)i,frequency));
             
             std::cout << "Added new Node(" << nodes.back()->GetCharacter() << "," << nodes.back()->GetValue() << ")" << std::endl;
         }
@@ -140,14 +204,14 @@ std::vector<Node*> Huffman::CreateNodes(const std::string& text)
  */
 int Huffman::GetFrequency(char character, const std::string& text)
 {
-    int appearance = 0;
+    int frequency = 0;
     
     for(int i = 0; i < text.size(); i++)
     {
-        if(character == text[i]) appearance++;
+        if(character == text[i]) frequency++;
     }
     
-    return appearance;
+    return frequency;
 }
 
 /**
@@ -187,14 +251,11 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
      */
     while(true)
     {
-        /*
-         Search for 2 not connected nodes
-         */
         Node *first;
         Node *second;
         
         notConnected = 0;
-        // Check if only one is left
+        // Check if only one is left.
         for(int i = 0; i < nodes.size(); i++)
         {
             if(nodes[i]->IsConnected() == false)
@@ -204,7 +265,7 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
         }
         if(notConnected < 2) break;
         
-        // Search for first
+        // Search for first not connected..
         for(int i = 0; i < nodes.size(); i++)
         {
             if(nodes[i]->IsConnected() == false) 
@@ -214,7 +275,7 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
             }
         }
         
-        // Search for second
+        // Search for second not connected.
         for(int i = 0; i < nodes.size(); i++)
         {
             if(nodes[i]->IsConnected() == false && nodes[i] != first) 
@@ -224,7 +285,7 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
             }
         }
         
-        // Set the new node to the correct position
+        // Set the new node to the correct position in the list.
         newValue = first->GetValue() + second->GetValue();
         for(int i = 0; i < nodes.size(); i++)
         {
@@ -242,17 +303,18 @@ void Huffman::ConnectNodes(std::vector<Node*> &nodes)
                 second->SetBinValue(1);
                 break;
             }
+            // If the new value is greate than every other value.
             if(i == nodes.size()-1)
             {
                 nodes.push_back(new Node(0, newValue));
                 
+                first->SetNextNode(nodes.back());
                 first->SetConnected(true);
                 first->SetBinValue(0);
-                first->SetNextNode(nodes.back());
 
+                second->SetNextNode(nodes.back());
                 second->SetConnected(true);
                 second->SetBinValue(1);
-                second->SetNextNode(nodes.back());
                 break;
             }
         }
@@ -274,12 +336,14 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
     
     for(int i = 0; i < nodes.size(); i++)
     {
+        // Only create keys for nodes with characters.
         if(nodes[i]->GetCharacter() != 0)
         {                       
             text = "";
             currentNode = nodes[i];
             while(true)
             {
+                // If the last node was reached, you got the key and can escape the loop..
                 if(currentNode->GetNextNode() == 0)
                 {
                     break;
@@ -288,6 +352,7 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
                 else text += "1";
                 currentNode = currentNode->GetNextNode();
             }
+            // Save key in the map.
             text =  ReverseString(text);
             table[nodes[i]->GetCharacter()] = text;
             std::cout << nodes[i]->GetCharacter() << ": " << text << std::endl;
@@ -296,6 +361,11 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
     return table;
 }
 
+/**
+ * Reverses a string.
+ * @param str
+ * @return the reversed string.
+ */
 std::string Huffman::ReverseString(const std::string& str)
 {
     std::string newString = "";
