@@ -94,7 +94,7 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
                     
                     if(check.size() > codes[j].size()) continue;
                     
-                    bool includes = true;
+                    /*bool includes = true;
                     for(int k = 0; k < check.size(); k++)
                     {
                         if(codes[j][k] != check[k]) includes = false;
@@ -103,7 +103,7 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
                     {
                         notOnly = true;
                         break;
-                    }
+                    }*/
                     
                     //if(codes[j].substr(0,check.size()+1) == check+text[cIndex+1])
                    // if(check+text[cIndex+1] == "110")  std::cout << codes[j].substr(0,check.size()) << std::endl;
