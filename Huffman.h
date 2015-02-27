@@ -32,6 +32,8 @@ private:
     static void ConnectNodes(std::vector<Node*> &nodes);
     static codeTable CreateCodeTable(std::vector<Node*> &nodes);
     static std::vector<Node*> CreateNodes(const std::string& text);
+    
+    static std::string ReverseString(const std::string& str);
 private:
     
 };

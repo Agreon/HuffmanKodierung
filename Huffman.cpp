@@ -54,11 +54,6 @@ std::string Huffman::EncodeString(const std::string& text, codeTable &table)
  * @param _text
  * @param table
  * @return the decoded string.
- * 
- * Problem:
- * When checking the second time, strings that were not possible before are interfering.
- * FUCK
- * 
  */
 std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
 {   
@@ -77,7 +72,7 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
     std::string check = "";
     check += _text[0];
     
-    bool found = false;
+    bool alreadyFound = false;
     
     std::cout << _text << std::endl;
     
@@ -86,35 +81,7 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
          for(int i = 0; i < codes.size(); i++)
          {
              if(check == codes[i])
-             {
-                bool notOnly = false;
-                for(int j = 0; j < codes.size(); j++)
-                {
-                    if(cIndex+1 >= text.size()) break;
-                    
-                    if(check.size() > codes[j].size()) continue;
-                    
-                    /*bool includes = true;
-                    for(int k = 0; k < check.size(); k++)
-                    {
-                        if(codes[j][k] != check[k]) includes = false;
-                    }
-                    if(includes)
-                    {
-                        notOnly = true;
-                        break;
-                    }*/
-                    
-                    //if(codes[j].substr(0,check.size()+1) == check+text[cIndex+1])
-                   // if(check+text[cIndex+1] == "110")  std::cout << codes[j].substr(0,check.size()) << std::endl;
-                    if(codes[j] == check+text[cIndex+1] && codes[j].size() >= codes[i].size()) 
-                    {
-                        notOnly = true;
-                        break;
-                    }
-                }
-                if(notOnly) break;
-                 
+             {                
                 text = text.substr(check.size());
                 for(auto const &it : table) 
                 {
@@ -126,13 +93,13 @@ std::string Huffman::DecodeString(const std::string& _text, codeTable &table)
                 cIndex = 0;
                 check = "";
                 check += text[0];
-                found = true;
+                alreadyFound = true;
                 break;
              }
          }
-         if(found)
+         if(alreadyFound)
          {
-             found = false;
+             alreadyFound = false;
              continue;
          }
         
@@ -321,9 +288,21 @@ codeTable Huffman::CreateCodeTable(std::vector<Node*>& nodes)
                 else text += "1";
                 currentNode = currentNode->GetNextNode();
             }
+            text =  ReverseString(text);
             table[nodes[i]->GetCharacter()] = text;
             std::cout << nodes[i]->GetCharacter() << ": " << text << std::endl;
         }
     }
     return table;
+}
+
+std::string Huffman::ReverseString(const std::string& str)
+{
+    std::string newString = "";
+    
+    for(int i = str.size(); i >= 0; i--)
+    {
+        newString += str[i];
+    }
+    return newString;    
 }

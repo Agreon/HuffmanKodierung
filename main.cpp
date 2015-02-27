@@ -13,18 +13,8 @@ using namespace std;
 
 
 int main(int argc, char** argv)
-{
-    /*Huffman huffman;
-        
-    codeTable table = huffman.GenerateCodeTable("hallo");
-    
-    std::string enc = huffman.EncodeString("hallo",table);
-    std::cout << enc << std::endl;
-    
-    std::cout << huffman.DecodeString(enc,table);
-    */
-    
-    std::string toEncode = "hallolukas";
+{   
+    std::string toEncode = "hallo lukas!";
     codeTable table = Huffman::GenerateCodeTable(toEncode);
     std::string encoded = Huffman::EncodeString(toEncode,table);
     std::string decoded = Huffman::DecodeString(encoded, table);
